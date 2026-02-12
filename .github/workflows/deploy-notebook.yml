@@ -125,15 +125,18 @@ jobs:
         {
           "name": "WF_ADB",
           "format": "MULTI_TASK",
-          "tasks":  [
+          "tasks": [
               {
               "task_key": "PrepAmb",
               "description": "Ejecuta notebook PrepAmb",
               "notebook_task": {
                 "notebook_path": "/py/scripts/main/Preparacion_Ambiente",
-                "source": "WORKSPACE"
+                "source": "WORKSPACE",
+                "base_parameters": {
+                  "storageName": "adlssmartdataev0303"
+                }
               },
-              "job_cluster_key": "serverless_cluster",
+              "existing_cluster_id": "$CLUSTER_ID",
               "timeout_seconds": 3600,
               "max_retries": 2
             },
@@ -142,9 +145,14 @@ jobs:
               "description": "Ejecuta notebook ingest_circuits",
               "notebook_task": {
                 "notebook_path": "/py/scripts/main/Ingest_circuits_data",
-                "source": "WORKSPACE"
+                "source": "WORKSPACE",
+                "base_parameters": {
+                  "container": "raw",
+                  "catalogo": "catalog_smartdata",
+                  "esquema": "bronze"
+                }
               },
-              "job_cluster_key": "serverless_cluster",
+              "existing_cluster_id": "$CLUSTER_ID",
               "timeout_seconds": 3600,
               "max_retries": 2,
               "depends_on": [
@@ -158,9 +166,14 @@ jobs:
               "description": "Ejecuta notebook ingest_racing",
               "notebook_task": {
                 "notebook_path": "/py/scripts/main/Ingest_racing_data",
-                "source": "WORKSPACE"
+                "source": "WORKSPACE",
+                "base_parameters": {
+                  "container": "raw",
+                  "catalogo": "catalog_smartdata",
+                  "esquema": "bronze"
+                }
               },
-              "job_cluster_key": "serverless_cluster",
+              "existing_cluster_id": "$CLUSTER_ID",
               "timeout_seconds": 3600,
               "max_retries": 2,
               "depends_on": [
@@ -174,9 +187,14 @@ jobs:
               "description": "Ejecuta notebook Transform",
               "notebook_task": {
                 "notebook_path": "/py/scripts/main/Transform",
-                "source": "WORKSPACE"
+                "source": "WORKSPACE",
+                "base_parameters": {
+                  "catalogo": "catalog_smartdata",
+                  "esquema_source": "bronze",
+                  "esquema_sink": "silver"
+                }
               },
-              "job_cluster_key": "serverless_cluster",
+              "existing_cluster_id": "$CLUSTER_ID",
               "timeout_seconds": 3600,
               "max_retries": 2,
               "depends_on": [
@@ -188,14 +206,19 @@ jobs:
                 }
               ]
             },
-            {
+                        {
               "task_key": "Load",
               "description": "Ejecuta notebook Load",
               "notebook_task": {
                 "notebook_path": "/py/scripts/main/Load",
-                "source": "WORKSPACE"
+                "source": "WORKSPACE",
+                "base_parameters": {
+                  "catalogo": "catalog_smartdata",
+                  "esquema_source": "silver",
+                  "esquema_sink": "golden"
+                }
               },
-              "job_cluster_key": "serverless_cluster",
+              "existing_cluster_id": "$CLUSTER_ID",
               "timeout_seconds": 3600,
               "max_retries": 2,
               "depends_on": [
